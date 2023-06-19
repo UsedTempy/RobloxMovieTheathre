@@ -24,8 +24,6 @@ def get_frame_data(frame):
 
 @app.route('/video', methods=['GET'])
 def get_video():
-    print("Received")
-
     # Get the Movie Name, Buffer Length, and Start Point from the URL parameters
     movie_name = request.args.get('movie_name')
     buffer_length = int(request.args.get('buffer_length', default=800))
@@ -85,12 +83,20 @@ def get_video():
     }
 
     jsonifiedTable = jsonify(responseData)
-    print("Return Data")
     return jsonifiedTable
 
 @app.route('/movies', methods=['GET'])
 def get_movies():
-    return jsonify({'result': False})
+    formattedList = {}
+    for movie_name in MovieList:
+        img = Image.open("Thumbnails/"+movie_name)
+        img = img.resize((720, 480))
+        img = img.convert("RGB")
+        bitmap_data = img.tobytes().hex()
+
+        formattedList[movie_name]: bitmap_data
+
+    return jsonify({'movie_list': formattedList})
 
 @app.route('/frame_count/', methods=['GET'])
 def get_frame_count():
