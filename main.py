@@ -29,8 +29,6 @@ def get_video():
     buffer_length = int(request.args.get('buffer_length', default=800))
     start_point = int(request.args.get('start_point', default=0))
 
-    print(start_point, buffer_length)
-
     # Check if the movie name exists in the MovieList dictionary
     if movie_name not in MovieList:
         return jsonify({'error': 'Invalid movie name'})
