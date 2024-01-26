@@ -1,11 +1,8 @@
 from PIL import Image
 from fastapi import FastAPI, HTTPException, Query
 from moviepy.editor import VideoFileClip
-from concurrent.futures import ProcessPoolExecutor
 import base64
-import asyncio
 from multiprocessing import Pool
-import struct
 
 app = FastAPI()
 
