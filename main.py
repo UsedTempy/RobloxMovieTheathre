@@ -9,20 +9,20 @@ app = FastAPI()
 fps = 30
 
 MovieList = {
-    "ShrekMovie": "VideoFolder/ShrekMOV.mov",
+    "ShrekMovie": "VideoFolder/ShrekMov.mp4",
 }
 
 def get_frame_data(frame):
     img = Image.fromarray(frame)
-    img = img.resize((160, 90))
+    img = img.resize((256, 144))
     img = img.convert("RGB")
     return img.tobytes().hex()
 
 @app.get('/video/')
 async def get_video(
-    movie_name: str = Query(..., description="Name of the movie"),
-    buffer_length: int = Query(10, description="Buffer length in frames (default: 10)"),
-    start_point: int = Query(0, description="Start point in frames (default: 0)"),
+        movie_name: str = Query(..., description="Name of the movie"),
+        buffer_length: int = Query(10, description="Buffer length in frames (default: 10)"),
+        start_point: int = Query(0, description="Start point in frames (default: 0)"),
 ):
     print(movie_name, buffer_length, start_point)
 
@@ -30,9 +30,8 @@ async def get_video(
         raise HTTPException(status_code=404, detail="Movie not found")
 
     movie_path = MovieList[movie_name]
-
     clip = VideoFileClip(movie_path)
-    
+
     total_frames = int(clip.fps * clip.duration)
     buffer_length = min(buffer_length, total_frames - start_point)
     end_point = start_point + buffer_length
@@ -41,7 +40,8 @@ async def get_video(
     bitmap_data_list = []
 
     with Pool() as pool:
-        for i, frame_data in enumerate(pool.imap_unordered(get_frame_data, clip.iter_frames(fps=fps), chunksize=1), start=1):
+        for i, frame_data in enumerate(pool.imap_unordered(get_frame_data, clip.iter_frames(fps=fps), chunksize=1),
+                                       start=1):
             if i < start_point:
                 continue
 
@@ -64,6 +64,7 @@ async def get_video(
 
     return responseData
 
+
 @app.get('/movies/')
 def get_movies():
     formattedList = {}
@@ -76,6 +77,7 @@ def get_movies():
         formattedList[movie_name] = bitmap_data
 
     return {'movie_list': formattedList}
+
 
 @app.get('/frame_count/')
 def get_frame_count(movie_name: str = Query(..., description="Name of the movie")):
